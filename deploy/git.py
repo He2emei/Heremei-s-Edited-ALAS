@@ -62,7 +62,8 @@ class GitManager(DeployConfig):
             if os.path.exists(lock_file):
                 logger.info(f'Lock file {lock_file} exists, removing')
                 os.remove(lock_file)
-        self.execute(f'"{self.git}" reset --hard {source}/{branch}')
+        if not self.KeepLocalChanges:
+            self.execute(f'"{self.git}" reset --hard {source}/{branch}')
         self.execute(f'"{self.git}" pull --ff-only {source} {branch}')
 
         logger.hr('Show Version', 1)
@@ -76,6 +77,7 @@ class GitManager(DeployConfig):
             source='origin',
             branch='master',
             git=self.git,
+            keep_local_changes=self.KeepLocalChanges,
         )
         client.logger = logger
         return client

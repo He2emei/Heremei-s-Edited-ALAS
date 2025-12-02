@@ -362,7 +362,7 @@ class OperationSiren(OSMap):
                     check_rest_ap = False
                 if not self.is_cl1_enabled and self.config.OpsiGeneral_BuyActionPointLimit > 0:
                     keep_current_ap = False
-                self.action_point_set(cost=0, keep_current_ap=keep_current_ap, check_rest_ap=check_rest_ap)
+                self.action_point_set(cost=5, keep_current_ap=keep_current_ap, check_rest_ap=check_rest_ap)
                 ap_checked = True
 
             # (1252, 1012) is the coordinate of zone 134 (the center zone) in os_globe_map.png
@@ -381,7 +381,11 @@ class OperationSiren(OSMap):
                         submarine_call=self.config.OpsiFleet_Submarine)
                     self.run_auto_search()
                     self.handle_after_auto_search()
-                    self.config.check_task_switch()
+            try:
+                self.config.check_task_switch()
+            except TaskEnd:
+                self.config.task_delay(minute=1)
+                raise
             else:
                 zones = self.zone_select(hazard_level=self.config.OpsiMeowfficerFarming_HazardLevel) \
                     .delete(SelectedGrids([self.zone])) \
@@ -396,7 +400,11 @@ class OperationSiren(OSMap):
                     submarine_call=self.config.OpsiFleet_Submarine)
                 self.run_auto_search()
                 self.handle_after_auto_search()
-                self.config.check_task_switch()
+        try:
+            self.config.check_task_switch()
+        except TaskEnd:
+            self.config.task_delay(minute=1)
+            raise
 
     def os_hazard1_leveling(self):
         logger.hr('OS hazard 1 leveling', level=1)
@@ -405,11 +413,9 @@ class OperationSiren(OSMap):
             OpsiGeneral_DoRandomMapEvent=True,
             OpsiGeneral_AkashiShopFilter='ActionPoint',
         )
-        if not self.config.is_task_enabled('OpsiMeowfficerFarming'):
-            self.config.cross_set(keys='OpsiMeowfficerFarming.Scheduler.Enable', value=True)
         while True:
             # Limited action point preserve of hazard 1 to 200
-            self.config.OS_ACTION_POINT_PRESERVE = 200
+            self.config.OS_ACTION_POINT_PRESERVE = 5
             if self.config.is_task_enabled('OpsiAshBeacon') \
                     and not self._ash_fully_collected \
                     and self.config.OpsiAshBeacon_EnsureFullyCollected:
@@ -432,7 +438,7 @@ class OperationSiren(OSMap):
             keep_current_ap = True
             if self.config.OpsiGeneral_BuyActionPointLimit > 0:
                 keep_current_ap = False
-            self.action_point_set(cost=70, keep_current_ap=keep_current_ap, check_rest_ap=True)
+            self.action_point_set(cost=5, keep_current_ap=keep_current_ap, check_rest_ap=True)
             if self._action_point_total >= 3000:
                 with self.config.multi_set():
                     self.config.task_delay(server_update=True)
@@ -451,7 +457,11 @@ class OperationSiren(OSMap):
             self.run_strategic_search()
 
             self.handle_after_auto_search()
+        try:
             self.config.check_task_switch()
+        except TaskEnd:
+            self.config.task_delay(minute=1)
+            raise
 
     def _os_explore_task_delay(self):
         """
@@ -538,7 +548,11 @@ class OperationSiren(OSMap):
                 logger.warning('Zone cleared but did not finish any combat')
                 self._os_explore_failed_zone.append(zone)
             self.handle_after_auto_search()
+        try:
             self.config.check_task_switch()
+        except TaskEnd:
+            self.config.task_delay(minute=1)
+            raise
 
             # Reached end
             if zone == order[-1]:

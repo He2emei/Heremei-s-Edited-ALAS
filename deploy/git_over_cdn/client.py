@@ -49,7 +49,7 @@ class PrintLogger:
 class GitOverCdnClient:
     logger = PrintLogger()
 
-    def __init__(self, url, folder, source='origin', branch='master', git='git'):
+    def __init__(self, url, folder, source='origin', branch='master', git='git', keep_local_changes=False):
         """
         Args:
             url: http://127.0.0.1:22251/pack/LmeSzinc_AzurLaneAutoScript_master/
@@ -60,6 +60,7 @@ class GitOverCdnClient:
         self.source = source
         self.branch = branch
         self.git = git
+        self.keep_local_changes = keep_local_changes
 
     def filepath(self, path):
         path = os.path.join(self.folder, '.git', path)
@@ -217,7 +218,8 @@ class GitOverCdnClient:
             if os.path.exists(lock_file):
                 self.logger.info(f'Lock file {lock_file} exists, removing')
                 os.remove(lock_file)
-        self.git_command('reset', '--hard', f'{self.source}/{self.branch}')
+        if not self.keep_local_changes:
+            self.git_command('reset', '--hard', f'{self.source}/{self.branch}')
 
     def get_status(self):
         """
