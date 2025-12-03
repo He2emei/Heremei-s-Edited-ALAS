@@ -457,11 +457,8 @@ class OperationSiren(OSMap):
             self.run_strategic_search()
 
             self.handle_after_auto_search()
-        try:
+            
             self.config.check_task_switch()
-        except TaskEnd:
-            self.config.task_delay(minute=1)
-            raise
 
     def _os_explore_task_delay(self):
         """
