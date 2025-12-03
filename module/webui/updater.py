@@ -22,6 +22,7 @@ class Updater(DeployConfig, GitManager, PipManager):
         super().__init__(file=file)
         self.state = 0
         self.event: threading.Event = None
+        self.UpstreamRemote = "upstream"
 
     @property
     def delay(self):
@@ -81,7 +82,7 @@ class Updater(DeployConfig, GitManager, PipManager):
                 # failed, should fallback to `git pull`
                 pass
 
-        source = "origin"
+        source = self.UpstreamRemote
         for _ in range(3):
             if self.execute(
                 f'"{self.git}" fetch {source} {self.Branch}', allow_failure=True

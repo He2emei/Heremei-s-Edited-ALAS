@@ -779,7 +779,7 @@ class AlasGUI(Frame):
             with use_scope("updater_info", clear=True):
                 local_commit = updater.get_commit(short_sha1=True)
                 upstream_commit = updater.get_commit(
-                    f"origin/{updater.Branch}", short_sha1=True
+                    f"{updater.UpstreamRemote}/{updater.Branch}", short_sha1=True
                 )
                 put_table(
                     [
@@ -797,7 +797,7 @@ class AlasGUI(Frame):
             with use_scope("updater_detail", clear=True):
                 put_text(t("Gui.Update.DetailedHistory"))
                 history = updater.get_commit(
-                    f"origin/{updater.Branch}", n=20, short_sha1=True
+                    f"{updater.UpstreamRemote}/{updater.Branch}", n=20, short_sha1=True
                 )
                 put_table(
                     [commit for commit in history],
